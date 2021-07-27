@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import path from "path";
+import { URL } from "url";
 
 if (process.env.NODE_ENV !== "production") await import("dotenv/config.js");
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -19,10 +19,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "client/build")));
+  const pathToBuild = new URL("./client/build", import.meta.url).pathname;
+  const pathToIndexHtml = new URL("./client/build/index.js", import.meta.url)
+    .pathname;
+
+  app.use(express.static(pathToBuild));
 
   app.get("*", function (req, res) {
-    res.sendFile(path.join(__dirname, "client/build", "index.html"));
+    res.sendFile(pathToIndexHtml);
   });
 }
 
