@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { URL } from "url";
+import compression from "compression";
 
 if (process.env.NODE_ENV !== "production") await import("dotenv/config.js");
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -15,6 +16,7 @@ const port = process.env.PORT || 5000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(compression());
 
 app.use(cors());
 
