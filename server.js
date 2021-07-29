@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { URL } from "url";
 import compression from "compression";
+import enforce from "express-sslify";
 
 if (process.env.NODE_ENV !== "production") await import("dotenv/config.js");
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -21,11 +22,12 @@ app.use(compression());
 app.use(cors());
 
 if (process.env.NODE_ENV === "production") {
-  const pathToBuild = new URL("./client/build", import.meta.url).pathname;
+  const pathToClientBuild = new URL("./client/build", import.meta.url).pathname;
   const pathToIndexHtml = new URL("./client/build/index.js", import.meta.url)
     .pathname;
 
-  app.use(express.static(pathToBuild));
+  app.use(enforce.HTTPS({ trustProtoHeader: true }));
+  app.use(express.static(pathToClientBuild));
 
   app.get("*", function (req, res) {
     res.sendFile(pathToIndexHtml);
